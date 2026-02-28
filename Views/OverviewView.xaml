@@ -1,0 +1,125 @@
+<UserControl x:Class="Clash_WPF.Views.OverviewView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:Clash_WPF.Converters">
+
+    <UserControl.Resources>
+        <conv:SpeedToStringConverter x:Key="SpeedConv"/>
+        <conv:BytesToStringConverter x:Key="BytesConv"/>
+        <conv:BoolToStatusConverter x:Key="StatusConv"/>
+        <conv:BoolToStatusColorConverter x:Key="StatusColorConv"/>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="4">
+            <TextBlock Text="概览" Style="{StaticResource PageTitle}"/>
+
+            <!-- Status Cards Row -->
+            <WrapPanel Margin="0,0,0,16">
+                <!-- Core Status -->
+                <Border Style="{StaticResource Card}" Margin="0,0,12,12" MinWidth="200">
+                    <StackPanel>
+                        <TextBlock Text="内核状态" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="10" Height="10" Margin="0,0,8,0"
+                                     Fill="{Binding IsCoreRunning, Converter={StaticResource StatusColorConv}}"/>
+                            <TextBlock Text="{Binding IsCoreRunning, Converter={StaticResource StatusConv}}"
+                                       Foreground="{Binding IsCoreRunning, Converter={StaticResource StatusColorConv}}"
+                                       FontSize="16" FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding CoreVersion, StringFormat='版本: {0}'}"
+                                   Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" Margin="0,6,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Proxy Mode -->
+                <Border Style="{StaticResource Card}" Margin="0,0,12,12" MinWidth="200">
+                    <StackPanel>
+                        <TextBlock Text="代理模式" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                            <RadioButton Content="规则" GroupName="ProxyMode" Margin="0,0,6,0"
+                                         IsChecked="{Binding ProxyMode, Converter={x:Static conv:ModeConverter.Rule}}"
+                                         Style="{StaticResource ModeRadioButton}"/>
+                            <RadioButton Content="全局" GroupName="ProxyMode" Margin="0,0,6,0"
+                                         IsChecked="{Binding ProxyMode, Converter={x:Static conv:ModeConverter.Global}}"
+                                         Style="{StaticResource ModeRadioButton}"/>
+                            <RadioButton Content="直连" GroupName="ProxyMode"
+                                         IsChecked="{Binding ProxyMode, Converter={x:Static conv:ModeConverter.Direct}}"
+                                         Style="{StaticResource ModeRadioButton}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- System Proxy -->
+                <Border Style="{StaticResource Card}" Margin="0,0,12,12" MinWidth="200">
+                    <StackPanel>
+                        <TextBlock Text="系统代理" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8"/>
+                        <CheckBox IsChecked="{Binding SystemProxy}" Style="{StaticResource ToggleSwitch}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Active Profile -->
+                <Border Style="{StaticResource Card}" Margin="0,0,12,12" MinWidth="200">
+                    <StackPanel>
+                        <TextBlock Text="当前订阅" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8"/>
+                        <TextBlock Text="{Binding ActiveProfileName}" Foreground="{StaticResource TextPrimaryBrush}" FontSize="16" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Border>
+            </WrapPanel>
+
+            <!-- Traffic -->
+            <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="流量统计" Style="{StaticResource SectionTitle}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Upload Speed -->
+                        <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,12">
+                            <TextBlock Text="↑ 上传速度" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                            <TextBlock Text="{Binding UploadSpeed, Converter={StaticResource SpeedConv}}"
+                                       FontSize="20" FontWeight="Bold" Foreground="{StaticResource WarningBrush}"/>
+                        </StackPanel>
+
+                        <!-- Download Speed -->
+                        <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,12">
+                            <TextBlock Text="↓ 下载速度" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                            <TextBlock Text="{Binding DownloadSpeed, Converter={StaticResource SpeedConv}}"
+                                       FontSize="20" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}"/>
+                        </StackPanel>
+
+                        <!-- Upload Total -->
+                        <StackPanel Grid.Row="1" Grid.Column="0">
+                            <TextBlock Text="↑ 上传总量" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                            <TextBlock Text="{Binding UploadTotal, Converter={StaticResource BytesConv}}"
+                                       FontSize="15"/>
+                        </StackPanel>
+
+                        <!-- Download Total -->
+                        <StackPanel Grid.Row="1" Grid.Column="1">
+                            <TextBlock Text="↓ 下载总量" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                            <TextBlock Text="{Binding DownloadTotal, Converter={StaticResource BytesConv}}"
+                                       FontSize="15"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Connections -->
+            <Border Style="{StaticResource Card}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="活跃连接" Foreground="{StaticResource TextSecondaryBrush}" FontSize="13" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding ActiveConnections}" FontSize="22" FontWeight="Bold" Margin="12,0,0,0"
+                               Foreground="{StaticResource PrimaryBrush}"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
