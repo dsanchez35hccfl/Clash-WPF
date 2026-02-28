@@ -20,4 +20,19 @@
     <Using Remove="System.Drawing" />
   </ItemGroup>
 
+  <!-- Copy bundled runtime files into output 'core' folder so the app can find core and wintun.dll -->
+  <ItemGroup>
+    <!-- Mihomo core executable(s) placed under Resources will be copied to output/core/ -->
+    <Content Include="Resources\mihomo*.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>core\%(Filename)%(Extension)</TargetPath>
+    </Content>
+
+    <!-- Wintun DLL (or named variants) placed under Resources will be copied to output/core/ -->
+    <Content Include="Resources\wintun*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>core\%(Filename)%(Extension)</TargetPath>
+    </Content>
+  </ItemGroup>
+
 </Project>

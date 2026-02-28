@@ -98,6 +98,36 @@ public class MainViewModel : ViewModelBase
         // Ensure config.yaml exists before attempting to start the core
         _profileManager.EnsureMinimalConfig();
 
+        // TUN auto-management on startup:
+        // If wintun.dll is not present in the resolved config dir, try to
+        // download it (non-elevated). If download fails, default to disabling
+        // Tun in config so UI and core won't attempt to use it.
+        try
+        {
+            var configDir = _profileManager.ResolvedConfigDir;
+            var disabledPath = System.IO.Path.Combine(configDir, "wintun.dll.disabled");
+            var exists = ClashCoreManager.IsWintunPresent(configDir) || System.IO.File.Exists(disabledPath);
+            if (!exists)
+            {
+                var installed = await ClashCoreManager.InstallWintunAsync(configDir);
+                if (installed)
+                {
+                    _profileManager.Config.TunEnabled = true;
+                    _profileManager.Save();
+                    SettingsVM.TunEnabled = true;
+                    SettingsVM.StatusMessage = "自动下载 wintun.dll 成功，已启用 TUN。";
+                }
+                else
+                {
+                    _profileManager.Config.TunEnabled = false;
+                    _profileManager.Save();
+                    SettingsVM.TunEnabled = false;
+                    SettingsVM.StatusMessage = "未检测到 wintun.dll，已禁用 TUN（如需启用请在设置中安装或以管理员权限写入 DLL）。";
+                }
+            }
+        }
+        catch { /* ignore startup TUN auto-install errors */ }
+
         if (_profileManager.Config.AutoStartCore &&
             !string.IsNullOrEmpty(_profileManager.Config.CorePath))
         {
